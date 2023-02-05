@@ -26,7 +26,12 @@ defmodule AstroWeb.Endpoint do
       _ ->
         Phoenix.Transports.WebSocket.call(
           conn,
-          {AstroWeb.Endpoint, AstroWeb.Socket, [path: "/", timeout: :infinity]}
+          {AstroWeb.Endpoint, AstroWeb.Socket,
+           [
+             path: "/",
+             check_origin: false,
+             timeout: :infinity
+           ]}
         )
     end
   end
