@@ -1,12 +1,9 @@
 # Astro
+An Nostr relay, built using Elixir.
 
 ## Implementation
 
-- [ ] NIP-01
-  - [x] PubSub subscriptions
-        Need to figure out optimized way due to prefix handling? Probably a core GenServer that processes new events against filter lists?
-  - [ ] "#e" and "#p" filtering
-  - [x] Message verification https://github.com/RiverFinancial/bitcoinex/blob/master/lib/secp256k1/secp256k1.ex
+- [x] NIP-01
 - [x] NIP-11
 - [x] NIP-15
 - [x] NIP-20
