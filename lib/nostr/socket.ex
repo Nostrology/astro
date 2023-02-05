@@ -113,7 +113,7 @@ defmodule Nostr.Socket do
   # end
 
   def __info__({:socket_push, opcode, payload}, state) do
-    Logger.debug("SEND: #{payload}")
+    Logger.info("SEND: #{payload}")
     {:push, {opcode, payload}, state}
   end
 
@@ -148,7 +148,7 @@ defmodule Nostr.Socket do
     handler_response =
       case Jason.decode(message) do
         {:ok, request} ->
-          Logger.debug("RECV: #{inspect(request)}")
+          Logger.info("RECV: #{inspect(request)}")
 
           case request do
             ["REQ", subscription_id | filters] ->
