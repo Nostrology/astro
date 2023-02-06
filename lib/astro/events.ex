@@ -33,14 +33,6 @@ defmodule Astro.Events do
     %{kind: kind} = new_event = changeset.changes
 
     cond do
-      kind >= 1000 and kind < 10000 ->
-        # Regular Event
-        # A regular event is defined as an event with a kind 1000 <= n < 10000. Upon a regular event being received,
-        # the relay SHOULD send it to all clients with a matching filter, and SHOULD store it. New events of the
-        # same kind do not affect previous events in any way.
-
-        Astro.Repo.insert(changeset)
-
       kind >= 10000 and kind < 20000 ->
         # Replaceable Event
         # A replaceable event is defined as an event with a kind 10000 <= n < 20000. Upon a replaceable event
@@ -63,6 +55,15 @@ defmodule Astro.Events do
         # received, the relay SHOULD send it to all clients with a matching filter, and MUST NOT store it.
 
         {:ok, Ecto.Changeset.apply_changes(changeset.changes)}
+
+      true ->
+        # kind >= 1000 and kind < 10000
+        # Regular Event
+        # A regular event is defined as an event with a kind 1000 <= n < 10000. Upon a regular event being received,
+        # the relay SHOULD send it to all clients with a matching filter, and SHOULD store it. New events of the
+        # same kind do not affect previous events in any way.
+
+        Astro.Repo.insert(changeset)
     end
   end
 
