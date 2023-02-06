@@ -100,6 +100,25 @@ defmodule Astro.EventsTest do
              "a8b2d39d300b5a3ff91fc7b943944ebfd829a63ce2c0289431237473619a6975"
   end
 
+  test "generate_id/1 works for a problem child" do
+    event = %Event{
+      content:
+        "\n腾讯游戏部学习小群\n此群仅限产品经理\n运营同学请等下周分享会\n\nhttps://void.cat/d/W5tUEqZW2ePfda12hzCEU7.png",
+      created_at: 1_675_686_457,
+      id: "7f7e20512d2008bf32b26ff0ea2fb2146bd977e63de099fa42390ac97bf1c780",
+      kind: 42,
+      pubkey: "70ffe5cf08446dadb1ed29359a4294916fc64de567a77d7fa8bda9957a3074ff",
+      sig:
+        "28efcca55040bb7fd4ca5c64eec76a742db253620fb35812755d3a3453819557f88ea988bca7ad8aca3ac2a1a67a7df264e98539b85934b5f45ad86348cd2244",
+      tags: [
+        ["e", "42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5", "", "root"]
+      ]
+    }
+
+    assert generate_id(event) ==
+             "7f7e20512d2008bf32b26ff0ea2fb2146bd977e63de099fa42390ac97bf1c780"
+  end
+
   test "verify_signature/1 verifies signatures" do
     event = %Event{
       id: "a8b2d39d300b5a3ff91fc7b943944ebfd829a63ce2c0289431237473619a6975",

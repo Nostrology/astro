@@ -145,11 +145,11 @@ defmodule Nostr.Socket do
          state,
          socket
        ) do
+    Logger.info("RECV: #{message}")
+
     handler_response =
       case Jason.decode(message) do
         {:ok, request} ->
-          Logger.info("RECV: #{inspect(request)}")
-
           case request do
             ["REQ", subscription_id | filters] ->
               socket.handle_request(subscription_id, filters, socket)
