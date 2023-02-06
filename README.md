@@ -6,6 +6,7 @@ An Nostr relay, built using Elixir.
 - [x] NIP-01
 - [x] NIP-11
 - [x] NIP-15
+- [x] NIP-16
 - [x] NIP-20
 
 

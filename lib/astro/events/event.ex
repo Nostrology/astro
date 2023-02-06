@@ -4,7 +4,6 @@ defmodule Astro.Events.Event do
 
   @primary_key false
 
-  @derive {Jason.Encoder, only: [:id, :pubkey, :created_at, :kind, :tags, :content, :sig]}
   schema "events" do
     field :id, :string
     field :pubkey, :string

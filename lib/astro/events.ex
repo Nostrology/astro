@@ -12,16 +12,57 @@ defmodule Astro.Events do
         tags = transmute_tags(input_tags)
         changeset = Ecto.Changeset.put_assoc(changeset, :event_tags, tags)
 
-        {:ok, event} = Astro.Repo.insert(changeset)
+        case process_event(changeset) do
+          {:ok, event} ->
+            Astro.EventRouter.push_event(event)
+            {:ok, event}
 
-        Astro.EventRouter.push_event(event)
-
-        {:ok, event}
+          error ->
+            dbg(error)
+            :error
+        end
 
       errored ->
         dbg(errored)
         # NIP-01 doesn't define success / fail on event publishing
         :error
+    end
+  end
+
+  defp process_event(changeset) do
+    %{kind: kind} = new_event = changeset.changes
+
+    cond do
+      kind >= 1000 and kind < 10000 ->
+        # Regular Event
+        # A regular event is defined as an event with a kind 1000 <= n < 10000. Upon a regular event being received,
+        # the relay SHOULD send it to all clients with a matching filter, and SHOULD store it. New events of the
+        # same kind do not affect previous events in any way.
+
+        Astro.Repo.insert(changeset)
+
+      kind >= 10000 and kind < 20000 ->
+        # Replaceable Event
+        # A replaceable event is defined as an event with a kind 10000 <= n < 20000. Upon a replaceable event
+        # with a newer timestamp than the currently known latest replaceable event with the same kind being
+        # received, and signed by the same key, the old event SHOULD be discarded and replaced with the newer event.
+
+        # Ignore deletion error as we may not have the event yet
+        from(e in Event,
+          where:
+            e.pubkey == ^new_event.pubkey and e.kind == ^new_event.kind and
+              e.created_at < ^new_event.created_at
+        )
+        |> Repo.delete()
+
+        Astro.Repo.insert(changeset)
+
+      kind >= 20000 and kind < 30000 ->
+        # Ephemeral Event
+        # An ephemeral event is defined as an event with a kind 20000 <= n < 30000. Upon an ephemeral event being
+        # received, the relay SHOULD send it to all clients with a matching filter, and MUST NOT store it.
+
+        {:ok, Ecto.Changeset.apply_changes(changeset.changes)}
     end
   end
 
@@ -164,10 +205,6 @@ defmodule Astro.Events do
   defp build_condition(key, value) do
     field = @types[key]
     dynamic([e], field(e, ^field) == ^value)
-  end
-
-  defp field_selector([:tags, selector]) do
-    :tags
   end
 
   def json(%Event{} = event) do

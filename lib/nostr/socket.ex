@@ -160,6 +160,9 @@ defmodule Nostr.Socket do
             ["CLOSE", subscription_id] ->
               socket.handle_close(subscription_id, socket)
 
+            # ["AUTH", signed_event_json] ->
+            #   nil
+
             other ->
               Logger.warning("Unexpected Nostr request: #{inspect(other)}")
               socket.handle_other(request, socket)

@@ -33,7 +33,7 @@ defmodule AstroWeb.Socket do
     {:ok, socket}
   end
 
-  def handle_other(request, socket) do
+  def handle_other(_req, socket) do
     {:ok, socket}
   end
 

@@ -15,7 +15,7 @@ defmodule AstroWeb.Endpoint do
             description: "Astro Nostr Relay",
             pubkey: "npub1hmrjq05azqwrfcrffr35w6037c6y9h6y8vd9k7tlngqw5s7h8x6qae9s57",
             contact: "mailto:luke@axxim.net",
-            supported_nips: [1, 11, 15, 20],
+            supported_nips: [1, 11, 15, 16, 20],
             software: "https://github.com/Nostrology/astro",
             version: "deadbeef"
           })
