@@ -23,6 +23,7 @@ defmodule Astro.Events do
         end
 
       errored ->
+        # Good
         dbg(errored)
         # NIP-01 doesn't define success / fail on event publishing
         :error
@@ -67,7 +68,7 @@ defmodule Astro.Events do
     end
   end
 
-  defp transmute_tags(tags) do
+  def transmute_tags(tags) do
     Enum.map(tags, fn
       [key, value | params] ->
         params = %{
@@ -77,6 +78,7 @@ defmodule Astro.Events do
         }
 
         Astro.Events.Tag.changeset(%Astro.Events.Tag{}, params)
+
         params
     end)
   end
@@ -209,14 +211,13 @@ defmodule Astro.Events do
   end
 
   def json(%Event{} = event) do
-    # tags = event.tags |> Enum.map(fn {k, v} -> [k, v] end) |> Enum.into([])
-    # dbg(tags)
+    tags = Enum.map(event.event_tags, fn tag -> [tag.key, tag.value] ++ tag.params end)
 
     json(%{
       pubkey: event.pubkey,
       created_at: event.created_at,
       kind: event.kind,
-      tags: event.tags,
+      tags: tags,
       content: event.content
     })
   end

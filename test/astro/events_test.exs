@@ -82,10 +82,54 @@ defmodule Astro.EventsTest do
       assert Jason.encode!(event) ==
                "{\"content\":\"hello world\",\"created_at\":1675599987,\"id\":\"d2472b7bcd2490f82dfc06b6fad1695898581a21312a7aa7d4a3b4e1f06d358a\",\"kind\":1,\"pubkey\":\"74fcb177b758df25487504a0bf9b69bdd7ec99ed3d422a18f932709974f80875\",\"sig\":\"74837ea05b3568b9979777cef2c3d0b3e587f113811cc7405230837aa15122e3645ecd2f162ca1e31618f1d335266c85a19cb0ec62e9b4654fabc9e9b8f5f917\",\"tags\":[[\"e\",\"a8b2d39d300b5a3ff91fc7b943944ebfd829a63ce2c0289431237473619a6975\"]]}"
     end
+
+    test "handles when tags have empty values" do
+      event = %Event{
+        content:
+          "\nFree Airdrop for Damus verify users\n\n1. Join Telegram group\n2. Get your Damus verified and show proof\n3. Get free Sats\n\nJoin Group👉 https://t.me/zclub_app\n",
+        created_at: 1_675_698_976,
+        id: "eac9973a081c0b1c9189143bf76cb5dd3e58fb45c3470353b6f07e2ed4e137dd",
+        kind: 42,
+        pubkey: "4e0ebe6254074e8a0f7cfecce8ae504884ac7ee377ee2dff00b395664d162efd",
+        sig:
+          "99af079e9de9cfc0485d5f1439f23d3c17d55117008f85d3ed1e580740437fee2274e069cbe50c4caa613eeb0b827e9c5a62baf5d11b81566068fa8ccf01a4af",
+        event_tags: [
+          %Tag{
+            event_id: "eac9973a081c0b1c9189143bf76cb5dd3e58fb45c3470353b6f07e2ed4e137dd",
+            key: "e",
+            value: "42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5",
+            params: ["", "root"]
+          }
+        ]
+      }
+
+      assert Jason.encode!(event) ==
+               "{\"content\":\"\\nFree Airdrop for Damus verify users\\n\\n1. Join Telegram group\\n2. Get your Damus verified and show proof\\n3. Get free Sats\\n\\nJoin Group👉 https://t.me/zclub_app\\n\",\"created_at\":1675698976,\"id\":\"eac9973a081c0b1c9189143bf76cb5dd3e58fb45c3470353b6f07e2ed4e137dd\",\"kind\":42,\"pubkey\":\"4e0ebe6254074e8a0f7cfecce8ae504884ac7ee377ee2dff00b395664d162efd\",\"sig\":\"99af079e9de9cfc0485d5f1439f23d3c17d55117008f85d3ed1e580740437fee2274e069cbe50c4caa613eeb0b827e9c5a62baf5d11b81566068fa8ccf01a4af\",\"tags\":[[\"e\",\"42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5\",\"\",\"root\"]]}"
+    end
+  end
+
+  describe "Tags" do
+    test "transmute_tags/1 keeps empty tags" do
+      assert transmute_tags([
+               [
+                 "e",
+                 "42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5",
+                 "",
+                 "root"
+               ]
+             ]) ==
+               [
+                 %{
+                   key: "e",
+                   value: "42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5",
+                   params: ["", "root"]
+                 }
+               ]
+    end
   end
 
   test "generate_id/1 generates the correct id" do
-    event = %Event{
+    event = %{
       id: "a8b2d39d300b5a3ff91fc7b943944ebfd829a63ce2c0289431237473619a6975",
       pubkey: "74fcb177b758df25487504a0bf9b69bdd7ec99ed3d422a18f932709974f80875",
       created_at: 1_675_428_746,
@@ -101,22 +145,22 @@ defmodule Astro.EventsTest do
   end
 
   test "generate_id/1 works for a problem child" do
-    event = %Event{
-      content:
-        "\n腾讯游戏部学习小群\n此群仅限产品经理\n运营同学请等下周分享会\n\nhttps://void.cat/d/W5tUEqZW2ePfda12hzCEU7.png",
-      created_at: 1_675_686_457,
-      id: "7f7e20512d2008bf32b26ff0ea2fb2146bd977e63de099fa42390ac97bf1c780",
+    event = %{
+      id: "eac9973a081c0b1c9189143bf76cb5dd3e58fb45c3470353b6f07e2ed4e137dd",
+      pubkey: "4e0ebe6254074e8a0f7cfecce8ae504884ac7ee377ee2dff00b395664d162efd",
+      created_at: 1_675_698_976,
       kind: 42,
-      pubkey: "70ffe5cf08446dadb1ed29359a4294916fc64de567a77d7fa8bda9957a3074ff",
-      sig:
-        "28efcca55040bb7fd4ca5c64eec76a742db253620fb35812755d3a3453819557f88ea988bca7ad8aca3ac2a1a67a7df264e98539b85934b5f45ad86348cd2244",
       tags: [
         ["e", "42224859763652914db53052103f0b744df79dfc4efef7e950fc0802fc3df3c5", "", "root"]
-      ]
+      ],
+      content:
+        "\nFree Airdrop for Damus verify users\n\n1. Join Telegram group\n2. Get your Damus verified and show proof\n3. Get free Sats\n\nJoin Group👉 https://t.me/zclub_app\n",
+      sig:
+        "99af079e9de9cfc0485d5f1439f23d3c17d55117008f85d3ed1e580740437fee2274e069cbe50c4caa613eeb0b827e9c5a62baf5d11b81566068fa8ccf01a4af"
     }
 
     assert generate_id(event) ==
-             "7f7e20512d2008bf32b26ff0ea2fb2146bd977e63de099fa42390ac97bf1c780"
+             "eac9973a081c0b1c9189143bf76cb5dd3e58fb45c3470353b6f07e2ed4e137dd"
   end
 
   test "verify_signature/1 verifies signatures" do

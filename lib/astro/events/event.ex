@@ -23,11 +23,11 @@ defmodule Astro.Events.Event do
       :pubkey,
       :created_at,
       :kind,
-      :tags,
       :content,
       :sig
     ])
-    # |> cast_assoc(:tags)
+    # Tags must be cast to allow for empty values, eg ["e", "id", "", "root"]
+    |> cast(params, [:tags], empty_values: [])
     |> validate_required([
       :id,
       :pubkey,

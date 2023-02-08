@@ -48,7 +48,9 @@ defmodule Astro.MixProject do
       {:memento, "~> 0.3.2"},
       # Cryptography
       {:curvy, "~> 0.3"},
-      {:k256, "~> 0.0.7"}
+      {:k256, "~> 0.0.7"},
+      # Websocket Interop
+      {:mint_web_socket, "~> 1.0"}
     ]
   end
 
