@@ -103,7 +103,7 @@ defmodule Nostr.Socket do
     handle_in(message, state, socket)
   end
 
-  def __info__({:DOWN, ref, _, pid, reason}, {state, socket}) do
+  def __info__({:DOWN, _ref, _, _pid, _reason}, {state, socket}) do
     dbg("DOWN!")
     {:ok, {state, socket}}
   end

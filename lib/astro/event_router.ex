@@ -13,8 +13,6 @@ defmodule Astro.EventRouter do
   alias Astro.Events.Event
   alias Phoenix.PubSub
 
-  @telemetry [:astro, :event_router, :call]
-
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
