@@ -9,6 +9,20 @@ defmodule AstroWeb.Router do
   #   pipe_through :api
   # end
 
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :put_root_layout, {AstroWeb.Layouts, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  scope "/", AstroWeb do
+    pipe_through :browser
+
+    live "/", HomeLive
+  end
+
   # Enable LiveDashboard in development
   if Application.compile_env(:astro, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

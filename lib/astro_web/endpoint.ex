@@ -4,9 +4,9 @@ defmodule AstroWeb.Endpoint do
   @doc """
   Funky function to manually handle websocket connections so we can intercept the upgrade request to send NIP-11
   """
-  def socket_dispatch(conn, _opts) do
-    case Plug.Conn.get_req_header(conn, "accept") do
-      ["application/nostr+json"] ->
+  def socket_dispatch(%{request_path: "/"} = conn, _opts) do
+    case {Plug.Conn.get_req_header(conn, "accept"), Plug.Conn.get_req_header(conn, "upgrade")} do
+      {["application/nostr+json"], _} ->
         conn
         |> Plug.Conn.resp(
           200,
@@ -23,7 +23,7 @@ defmodule AstroWeb.Endpoint do
         |> Plug.Conn.put_resp_content_type("application/json")
         |> Plug.Conn.send_resp()
 
-      _ ->
+      {_, ["websocket"]} ->
         Phoenix.Transports.WebSocket.call(
           conn,
           {AstroWeb.Endpoint, AstroWeb.Socket,
@@ -33,17 +33,21 @@ defmodule AstroWeb.Endpoint do
              timeout: :infinity
            ]}
         )
+
+      _ ->
+        conn
     end
   end
 
-  # socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  @session_options [
+    store: :ets,
+    key: "_astro_key",
+    table: :session_storage
+  ]
 
-  # socket "/", AstroWeb.Socket,
-  #   longpoll: false,
-  #   websocket: [
-  #     path: "/",
-  #     timeout: :infinity
-  #   ]
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: true
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -76,5 +80,6 @@ defmodule AstroWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug Plug.Session, @session_options
   plug AstroWeb.Router
 end

@@ -13,6 +13,8 @@ defmodule Astro.EventRouter do
   alias Astro.Events.Event
   alias Phoenix.PubSub
 
+  @telemetry [:astro, :event_router, :call]
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -52,14 +54,29 @@ defmodule Astro.EventRouter do
 
   @impl true
   def handle_info({:new_event, event}, state) do
-    Enum.each(state.filters, fn {subscription_id, {pid, list_of_filters}} ->
-      Enum.each(list_of_filters, fn filters ->
-        if Astro.Events.matches_filters(event, filters) do
-          Logger.info("Astro.EventRouter: Sending event to #{subscription_id} on #{inspect(pid)}")
-          send(pid, {:new_event, event, subscription_id})
-        end
+    {time, subscribers} =
+      :timer.tc(fn ->
+        Enum.map(state.filters, fn {subscription_id, {pid, list_of_filters}} ->
+          Enum.each(list_of_filters, fn filters ->
+            if Astro.Events.matches_filters(event, filters) do
+              Logger.info(
+                "Astro.EventRouter: Sending event to #{subscription_id} on #{inspect(pid)}"
+              )
+
+              send(pid, {:new_event, event, subscription_id})
+            end
+          end)
+        end)
+        |> length()
       end)
-    end)
+
+    :telemetry.execute(
+      [:astro, :event_router, :event_filter_match],
+      %{duration: time},
+      %{
+        subscribers: subscribers
+      }
+    )
 
     {:noreply, state}
   end

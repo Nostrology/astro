@@ -21,6 +21,8 @@ defmodule Astro.Application do
       # {Astro.Worker, arg}
     ]
 
+    :ets.new(:session_storage, [:named_table, :public, read_concurrency: true])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Astro.Supervisor]

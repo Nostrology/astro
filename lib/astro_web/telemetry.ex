@@ -21,6 +21,11 @@ defmodule AstroWeb.Telemetry do
 
   def metrics do
     [
+      # Astro Metrics
+      summary("astro.event_router.event_filter_match.duration",
+        unit: {:native, :microsecond}
+      ),
+
       # Phoenix Metrics
       summary("phoenix.endpoint.start.system_time",
         unit: {:native, :millisecond}
