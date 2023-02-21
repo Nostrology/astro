@@ -11,8 +11,11 @@ defmodule AstroWeb.Socket do
         # Created event will be send to the user via their subscription (if subscribed!)
         send_message(["OK", event_id, true, "OK!"])
 
+      {:error, errors} when is_binary(errors) ->
+        send_message(["OK", event_id, false, "invalid: errors are: " <> errors])
+
       _ ->
-        send_message(["OK", event_id, false, "invalid: Not OK!"])
+        send_message(["OK", event_id, false, "invalid: unexpected errors"])
     end
 
     {:ok, socket}

@@ -43,7 +43,7 @@ defmodule Astro.Events.Event do
     |> validate_length(:sig, is: 128)
     |> validate_id()
     |> validate_signature()
-    |> unique_constraint(:id, name: :events_id_index)
+    |> unique_constraint(:id, name: :events_pkey)
   end
 
   @doc """

@@ -36,6 +36,27 @@ defmodule Astro.EventsTest do
                    "74837ea05b3568b9979777cef2c3d0b3e587f113811cc7405230837aa15122e3645ecd2f162ca1e31618f1d335266c85a19cb0ec62e9b4654fabc9e9b8f5f917"
                })
     end
+
+    test "create_event/1 doesn't allow duplicates" do
+      event = %{
+        "id" => "d2472b7bcd2490f82dfc06b6fad1695898581a21312a7aa7d4a3b4e1f06d358a",
+        "pubkey" => "74fcb177b758df25487504a0bf9b69bdd7ec99ed3d422a18f932709974f80875",
+        "created_at" => 1_675_599_987,
+        "kind" => 1,
+        "tags" => [
+          [
+            "e",
+            "a8b2d39d300b5a3ff91fc7b943944ebfd829a63ce2c0289431237473619a6975"
+          ]
+        ],
+        "content" => "hello world",
+        "sig" =>
+          "74837ea05b3568b9979777cef2c3d0b3e587f113811cc7405230837aa15122e3645ecd2f162ca1e31618f1d335266c85a19cb0ec62e9b4654fabc9e9b8f5f917"
+      }
+
+      assert {:ok, _} = create_event(event)
+      assert {:error, "id: has already been taken."} = create_event(event)
+    end
   end
 
   describe "Filter Tests" do

@@ -17,17 +17,25 @@ defmodule Astro.Events do
             Astro.EventRouter.push_event(event)
             {:ok, event}
 
-          error ->
-            dbg(error)
-            :error
+          {:error, changeset} ->
+            {:error, changeset_error_to_string(changeset)}
         end
 
       errored ->
-        # Good
-        dbg(errored)
-        # NIP-01 doesn't define success / fail on event publishing
-        :error
+        {:error, changeset_error_to_string(errored)}
     end
+  end
+
+  defp changeset_error_to_string(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+      Enum.reduce(opts, msg, fn {key, value}, acc ->
+        String.replace(acc, "%{#{key}}", to_string(value))
+      end)
+    end)
+    |> Enum.reduce("", fn {k, v}, acc ->
+      joined_errors = Enum.join(v, "; ")
+      "#{acc}#{k}: #{joined_errors}."
+    end)
   end
 
   defp process_event(changeset) do
